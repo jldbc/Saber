@@ -7,9 +7,14 @@ options(digits=3)
 
 function(input, output, session) {
   df = read.csv('/Users/jledoux/Documents/projects/Saber/baseball-data/predict_hof_bat.csv')
+  hof = read.csv('/Users/jledoux/Documents/projects/Saber/baseball-data/lahman/HallOfFame.csv')
+  on_recent_ballot = hof[hof$yearid==2017,'playerID']
+  df = df[!is.na(df$playerID),]
+  print(head(df))
+  df$is_current = ifelse(df$last_season==2017,1,0)
   df$Name = paste0(df$nameFirst, " ", df$nameLast)
   #df = read.csv('/Users/jledoux/Documents/projects/Saber/hof/data/all_past_orig.csv')
-  preds = read.csv('/Users/jledoux/Documents/projects/Saber/hof/data/currents_with_preds_logitcv.csv')
+  preds = read.csv('/Users/jledoux/Documents/projects/Saber/hof/data/currents_with_preds_logitcv2.csv')
   head(preds)
   keeps = c('Name', 'first_season', 'last_season', 'years_in_league', 'G_tot', 'H_tot', 'HR_tot', 'AVG', 'BABIP', 'OBP', 'wOBA', 
             'SLG', 'BB_tot', 'WAR_tot', 'RAR_tot', 'prob_hof')
@@ -50,12 +55,29 @@ function(input, output, session) {
     # Lables for axes
     xcol_name <- input$xcol
     ycol_name <- input$ycol
+    voting_year = input$voting_year
+    show_currents = input$show_currents
+    if(show_currents == FALSE){
+      df = df[df$is_current==0,]
+    }
+    print(head(df))
+    if(voting_year!="All Players"){
+      if(voting_year=="All Ballots"){
+        df = df[df$playerID %in% unique(hof$playerID),]
+      }
+      else{
+        df = df[df$playerID %in% unique(hof[hof$yearid==voting_year,'playerID']),]
+        print(df[df$nameLast=='Rose',])
+      }
+    }
     
     # Normally we could do something like props(x = ~BoxOffice, y = ~Reviews),
     # but since the inputs are strings, we need to do a little more work.
     xcol <- prop("x", as.symbol(input$xcol))
     ycol <- prop("y", as.symbol(input$ycol))
     
+    print(df)
+    df$inducted = factor(df$inducted, levels=c("Y", "N"))
     df %>%
       ggvis(x = xcol, y = ycol) %>%
       layer_points(size := 50, size.hover := 200,
@@ -65,7 +87,7 @@ function(input, output, session) {
       add_axis("x", title = xcol_name) %>%
       add_axis("y", title = ycol_name) %>%
       add_legend("stroke", title = "Member of Hall of Fame", values = c("Yes", "No")) %>%
-      scale_nominal("stroke", domain = c("Yes", "No"),
+      scale_nominal("stroke", domain = c("Y", "N"),
                     range = c("orange", "#aaa")) %>%
       set_options(width = 500, height = 500)
   })

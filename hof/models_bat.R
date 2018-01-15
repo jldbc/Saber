@@ -72,6 +72,6 @@ df_display$Name = paste0(df_display$nameFirst,' ',df_display$nameLast)
 
 tail(currents_display[order(currents_display$prob_hof),c('Name','playerID','prob_hof')], 30)
 
-write.csv(currents_display, '/Users/jledoux/Documents/projects/Saber/hof/data/currents_with_preds_logitcv.csv')
-write.csv(df_display, '/Users/jledoux/Documents/projects/Saber/hof/data/all_past_orig.csv')
+write.csv(currents_display, '/Users/jledoux/Documents/projects/Saber/hof/data/currents_with_preds_logitcv2.csv')
+write.csv(df_display, '/Users/jledoux/Documents/projects/Saber/hof/data/all_past_orig2.csv')
 
