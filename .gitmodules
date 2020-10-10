@@ -1,0 +1,3 @@
+[submodule "hot_streaks/hot_streaks/data/retrosplits"]
+	path = hot_streaks/hot_streaks/data/retrosplits
+	url = https://github.com/chadwickbureau/retrosplits
